@@ -2,11 +2,18 @@
 
 require 'rubygems'
 require 'logger'
+require 'yaml'
 require 'rss'
-gem 'tinyurl'
-require 'tinyurl'
+require 'open-uri'
+gem 'feed-normalizer'
+require 'feed-normalizer'
 gem 'twitter4r'
 require 'twitter'
+
+# Make sure your ruby installation has the RSS version 0.2.4
+# Read how to check it in:
+# http://ruby.geraldbauer.ca/rss-atom-read-web-feeds.html
+# http://www.igvita.com/2007/03/22/agile-rss-aggregator-in-ruby/
 
 class Twitterss
   
@@ -27,7 +34,8 @@ class Twitterss
     @config.each do |name, config|
       @logger.debug "#{name}:"
       @logger.debug "parsing #{config['rss']} "
-      feed = RSS::Parser.parse(config['rss'])
+      feed = FeedNormalizer::FeedNormalizer.parse(open(config['rss']))
+      # puts feed
       max = config['max'] || 5
       feed.items[0,max].each do |item|
         generate_message(item)
@@ -54,18 +62,15 @@ class Twitterss
   
 private
   
-  def get_tinyurl(url)
-    Tinyurl.new(url).tiny
-  end
-  
+
   def posted?(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.link]
+    @past_posts[name][item.urls]
   end
   
   def mark_posted(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.link] = true
+    @past_posts[name][item.urls] = true
   end
   
   def dump_state!
@@ -76,10 +81,11 @@ private
   end
   
   def generate_message(item)
-    tinyurl = get_tinyurl(item.link)
-    limit = TWITTER_LIMIT - tinyurl.length
-    message = "#{item.title.strip}: #{item.description.to_s.strip}"[0,limit-2] # 2 for '..'
-    message << "..#{tinyurl}"
+    link = item.urls[0].to_s
+    short_link = open('http://bit.ly/api?url=' + link, "UserAgent" => "Ruby-ShortLinkCreator").read
+    limit = TWITTER_LIMIT - short_link.length
+    message = "[GR] #{item.title.strip}: #{item.description.to_s.strip}"[0,limit-2] # 2 for '..'
+    message << "..#{short_link}"
     message
   end
 end
