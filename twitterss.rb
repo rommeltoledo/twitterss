@@ -33,10 +33,9 @@ class Twitterss
   def run
     @config.each do |name, config|
       @logger.debug "#{name}:"
-      @logger.debug "parsing #{config['rss']} "
-      feed = FeedNormalizer::FeedNormalizer.parse(open(config['rss']))
-      # puts feed
+      @logger.debug "parsing #{config['rss']} " 
       max = config['max'] || 5
+      feed = delete_already_posted(name,FeedNormalizer::FeedNormalizer.parse(open(config['rss'])) , max)
       feed.items[0,max].each do |item|
         generate_message(item)
         
@@ -62,6 +61,23 @@ class Twitterss
   
 private
   
+def delete_already_posted (name, feed, max)
+  count = 0;
+  while (max > count) && (feed.items.size>0)
+    if posted?(name, feed.items[count])
+      feed.items.delete_at(count)
+    else
+      puts "size = " + feed.items.size.to_s
+      if (feed.items.size <= 0)
+        count = max+1;
+      else
+        count = count +1
+      end
+    end
+    puts count     
+  end
+  feed
+end
 
   def posted?(name, item)
     @past_posts[name] ||= {}

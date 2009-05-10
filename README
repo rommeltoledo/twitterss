@@ -2,6 +2,8 @@
 
 bvandenbos@gmail.com 2009
 
+modified by Mariano Lizarraga
+
 == Description
 
 Twitterss is supposed to be a super simple, lightweight RSS => Twitter script
@@ -11,12 +13,18 @@ maintaining a lot of content from many different sources.  This allows your
 webapp/blog to only support RSS and allow this script to manage the push to
 Twitter.
 
+This fork of twitterrss adds support for Atom feeds and is specially geared
+towards allowing you to post to twitter the stories you share on Google Reader.
+
+It also replaces the TinyURL URL shortening service with bit.ly. It also adds 
+the capability to look for the MAX number of stories not yet posted from the 
+provided RSS feed and post them to twitter.
 
 == Requirements
 
  * Ruby 1.8.6/7 (probably works with other versions but not tested)
  * rubygems
- * Gems: twitter4r, tinyurl
+ * Gems: twitter4r, feed-normalizer
  * *nix or OSX.  Windows is not supported (though you might be able to get
    it to run on Windows).
 
@@ -27,7 +35,8 @@ Twitterss is meant to be used as a cron job that runs however often.
 
    $ ./twitterss twitterrss.yml
 
-
+	 $ ./twitterss -v twitterss.yml  # produces a verbose output for debugging 
+	
 == Configuration
 
 Configuration is handled by a YAML file.  If you're unfamiliar with YAML look
@@ -61,6 +70,7 @@ value for 'max' is 5.
 To keep track of posts that have already been sent to Twitter, Twitterrss needs
 to maintain state.  Currently it does this by dumping a file to the home
 directory of the user running the script (.twitterrss_history).
+
 
 
 == License
