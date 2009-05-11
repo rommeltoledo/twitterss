@@ -51,7 +51,6 @@ class Twitterss
       end
       
     end
-    dump_state!
   end  
   
   def self.dump_usage
@@ -67,14 +66,12 @@ def delete_already_posted (name, feed, max)
     if posted?(name, feed.items[count])
       feed.items.delete_at(count)
     else
-      puts "size = " + feed.items.size.to_s
       if (feed.items.size <= 0)
         count = max+1;
       else
         count = count +1
       end
-    end
-    puts count     
+    end  
   end
   feed
 end
@@ -87,6 +84,7 @@ end
   def mark_posted(name, item)
     @past_posts[name] ||= {}
     @past_posts[name][item.urls] = true
+    dump_state!
   end
   
   def dump_state!
