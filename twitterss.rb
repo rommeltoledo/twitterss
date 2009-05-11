@@ -96,9 +96,12 @@ end
   
   def generate_message(item)
     link = item.urls[0].to_s
+    puts
+    puts item.urls
+    puts
     short_link = open('http://bit.ly/api?url=' + link, "UserAgent" => "Ruby-ShortLinkCreator").read
     limit = TWITTER_LIMIT - short_link.length
-    message = "[GR] #{item.title.strip}: #{item.description.to_s.strip}"[0,limit-2] # 2 for '..'
+    message = "#{item.title.strip} (Via GoogleReader)"[0,limit-2] # 2 for '..'
     message << "..#{short_link}"
     message
   end
