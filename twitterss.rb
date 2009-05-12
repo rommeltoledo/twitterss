@@ -40,13 +40,13 @@ class Twitterss
         generate_message(item)
         
         if posted?(name, item)
-          @logger.debug "\"#{item.title}\"...skipped"
+          @logger.debug "\"#{clean_title(item.title.to_s)}\"...skipped"
         else
           twitter_client = Twitter::Client.new(:login => config['login'], :password => config['password'])
           twitter_client.status(:post, generate_message(item))
           
           mark_posted(name, item)
-          @logger.debug "\"#{item.title}\"...posted"
+          @logger.debug "\"#{clean_title(item.title.to_s)}\"...posted"
         end
       end
       
@@ -78,12 +78,12 @@ end
 
   def posted?(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.urls]
+    @past_posts[name][clean_link(item.urls[0].to_s)]
   end
   
   def mark_posted(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.urls] = true
+    @past_posts[name][clean_link(item.urls[0].to_s)] = true
     dump_state!
   end
   
@@ -94,14 +94,32 @@ end
     end
   end
   
+  # this two functions are a hack
+  # TODO:Fix this. Make the parsing of the links and titles mor ruby-ish
+  #      this looks like ANSI C !
+  def clean_link (link)        
+    if (link.include?('href='))
+      link = link.match(/href=["]?([^'"]*)[" ]/mi) 
+      link = link.to_s.strip
+      link = link[6,link.length - 7]
+    end
+    link        
+  end
+  
+  def clean_title (title)
+    if (title.include?('<title type'))
+      title = title.match(/[>]([^"]*)[<]/)
+      title = title.to_s.strip
+      title = title[1,title.length-2]
+    end
+    title 
+  end
+  
   def generate_message(item)
-    link = item.urls[0].to_s
-    puts
-    puts item.urls
-    puts
+    link = clean_link(item.urls[0].to_s)
     short_link = open('http://bit.ly/api?url=' + link, "UserAgent" => "Ruby-ShortLinkCreator").read
     limit = TWITTER_LIMIT - short_link.length
-    message = "#{item.title.strip} (Via GoogleReader)"[0,limit-2] # 2 for '..'
+    message = "#{clean_title(item.title.to_s).strip} (Via GoogleReader)"[0,limit-2] # 2 for '..'
     message << "..#{short_link}"
     message
   end
