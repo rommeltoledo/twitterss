@@ -42,7 +42,7 @@ class Twitterss
         if posted?(name, item)
           @logger.debug "\"#{item.title}\"...skipped"
         else
-          twitter_client = Twitter::Client.new(:login => config['login'], :password => config['password'])
+          twitter_client = Twitter::Client.new(:login => config['login'],:password => config['password'])
           twitter_client.status(:post, generate_message(item))
           
           mark_posted(name, item)
@@ -58,32 +58,32 @@ class Twitterss
     puts "  twitterss [-v] <configuration file>"
   end
   
-private
+  private
   
-def delete_already_posted (name, feed, max)
-  count = 0;
-  while (max > count) && (feed.items.size>0)
-    if posted?(name, feed.items[count])
-      feed.items.delete_at(count)
-    else
-      if (feed.items.size <= 0)
-        count = max+1;
+  def delete_already_posted (name, feed, max)
+    count = 0;
+    while (max > count) && (feed.items.size>0)
+      if posted?(name, feed.items[count])
+        feed.items.delete_at(count)
       else
-        count = count +1
+        if (feed.items.size <= 0)
+          count = max+1;
+        else
+          count = count +1
+        end
       end
-    end  
+    end
+    feed
   end
-  feed
-end
 
   def posted?(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.urls]
+    @past_posts[name][item.urls[0].href]
   end
   
   def mark_posted(name, item)
     @past_posts[name] ||= {}
-    @past_posts[name][item.urls] = true
+    @past_posts[name][item.urls[0].href] = true
     dump_state!
   end
   
@@ -95,13 +95,13 @@ end
   end
   
   def generate_message(item)
-    link = item.urls[0].to_s
+    link = item.urls[0].href.to_s
     puts
-    puts item.urls
+    puts link
     puts
-    short_link = open('http://bit.ly/api?url=' + link, "UserAgent" => "Ruby-ShortLinkCreator").read
+    short_link = open('http://bit.ly/api?url=' + link, "UserAgent" =>"Ruby-ShortLinkCreator").read
     limit = TWITTER_LIMIT - short_link.length
-    message = "#{item.title.strip} (Via GoogleReader)"[0,limit-2] # 2 for '..'
+    message = "#{item.title.content} (Via GoogleReader)"[0,limit-2] # 2 for '..'
     message << "..#{short_link}"
     message
   end

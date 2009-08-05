@@ -1,8 +1,6 @@
-
-googleShared:
-  rss: YourRSSFeedHere
-  login: your twitter login here
-  password: your twitter password here
-  max: max items to post at a time
-
+  AulaTI:
+    rss: http://www.google.com/reader/public/atom/user%2F11024841023893102110%2Fstate%2Fcom.google%2Fbroadcast
+    login: aulati
+    password: kaus#1990
+    max: 5
 
