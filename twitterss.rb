@@ -15,6 +15,9 @@ require 'twitter'
 # http://ruby.geraldbauer.ca/rss-atom-read-web-feeds.html
 # http://www.igvita.com/2007/03/22/agile-rss-aggregator-in-ruby/
 
+
+#//TODO This only loads 20 items from the Google Reader feed, if your max > number of non posted items it will crash
+
 class Twitterss
 
   TWITTER_LIMIT = 140
@@ -100,7 +103,7 @@ class Twitterss
     puts link
     puts
     short_link = open('http://bit.ly/api?url=' + link, "UserAgent" =>"Ruby-ShortLinkCreator").read
-    limit = TWITTER_LIMIT - short_link.length 
+    limit = TWITTER_LIMIT - short_link.length
     message = "#{item.title.content}"[0,limit-2] # 2 for '..'
     message << "..#{short_link}"
     message
