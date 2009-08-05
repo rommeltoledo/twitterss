@@ -101,7 +101,7 @@ class Twitterss
     puts
     short_link = open('http://bit.ly/api?url=' + link, "UserAgent" =>"Ruby-ShortLinkCreator").read
     limit = TWITTER_LIMIT - short_link.length
-    message = "#{item.title.content} (Via GoogleReader)"[0,limit-2] # 2 for '..'
+    message = "#{item.title.content}"[0,limit-2] # 2 for '..'
     message << "..#{short_link}"
     message
   end
