@@ -94,6 +94,27 @@ class Twitterss
     end
   end
   
+  # this two functions are a hack
+  # TODO:Fix this. Make the parsing of the links and titles mor ruby-ish
+  #      this looks like ANSI C !
+  def clean_link (link)        
+    if (link.include?('href='))
+      link = link.match(/href=["]?([^'"]*)[" ]/mi) 
+      link = link.to_s.strip
+      link = link[6,link.length - 7]
+    end
+    link        
+  end
+  
+  def clean_title (title)
+    if (title.include?('<title type'))
+      title = title.match(/[>]([^"]*)[<]/)
+      title = title.to_s.strip
+      title = title[1,title.length-2]
+    end
+    title 
+  end
+  
   def generate_message(item)
     link = item.urls[0].href.to_s
     puts
