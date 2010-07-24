@@ -1,5 +1,7 @@
 #!/usr/bin/ruby
 
+# list of requirements 
+
 require 'rubygems'
 require 'logger'
 require 'yaml'
